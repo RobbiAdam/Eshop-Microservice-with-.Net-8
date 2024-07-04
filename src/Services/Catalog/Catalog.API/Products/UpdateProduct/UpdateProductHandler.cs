@@ -7,19 +7,31 @@ namespace Catalog.API.Products.UpdateProduct
         string Description, string ImageFile, decimal Price) : ICommand<UpdateProductResult>;
 
     public record UpdateProductResult(bool IsSuccess);
+
+    public class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
+    {
+        public UpdateProductCommandValidator()
+        {
+            RuleFor(x => x.Id).NotEmpty().WithMessage("Id cannot be empty");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name cannot be empty");
+            RuleFor(x => x.Category).NotEmpty().WithMessage("Category cannot be empty");
+            RuleFor(x => x.Description).NotEmpty().WithMessage("Description cannot be empty");
+            RuleFor(x => x.Price).NotEmpty().GreaterThan(0).WithMessage("Price cannot be empty and must be greater than 0");
+        }
+    }
+
     internal class UpdateProductCommandHandler(
-        IDocumentSession session, ILogger<UpdateProductCommandHandler> logger) 
+        IDocumentSession session) 
         : ICommandHandler<UpdateProductCommand, UpdateProductResult>
     {
         public async Task<UpdateProductResult> Handle(
             UpdateProductCommand command, CancellationToken cancellationToken)
         {
-            logger.LogInformation("UpdateProductCommandHandler.Handle called by command: {@command}", command);
             var product = await session.LoadAsync<Product>(command.Id, cancellationToken);
 
             if (product == null)
             {
-                throw new ProductNotFoundException();
+                throw new ProductNotFoundException(command.Id);
             }
 
             product.Name = command.Name;
