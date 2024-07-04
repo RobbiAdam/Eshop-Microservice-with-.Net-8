@@ -1,4 +1,3 @@
-
 using Catalog.API;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,13 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddCatalogApi(builder.Configuration);
 
-builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapCarter();
 
-app.UseExceptionHandler(options => { });
+app.UseExceptionHandler(_ => { });
 
 app.Run();
