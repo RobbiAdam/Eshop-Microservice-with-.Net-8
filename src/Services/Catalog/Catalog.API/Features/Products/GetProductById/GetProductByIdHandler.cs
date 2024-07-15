@@ -1,6 +1,6 @@
 ﻿using Catalog.API.Exceptions;
 
-namespace Catalog.API.Products.GetProductById
+namespace Catalog.API.Features.Products.GetProductById
 {
     public record GetProductByIdQuery(
         Guid Id) : IQuery<GetProductByIdResult>;
@@ -8,7 +8,7 @@ namespace Catalog.API.Products.GetProductById
     public record GetProductByIdResult(Product Product);
 
     internal class GetProductByIdQueryHandler(
-        IDocumentSession session) 
+        IDocumentSession session)
         : IQueryHandler<GetProductByIdQuery, GetProductByIdResult>
     {
         public async Task<GetProductByIdResult> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)

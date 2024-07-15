@@ -1,4 +1,4 @@
-﻿namespace Catalog.API.Products.CreateProduct
+﻿namespace Catalog.API.Features.Products.CreateProduct
 {
     public record CreateProductCommand(
         string Name, string Description, List<string> Category, string ImageFile, decimal Price)
@@ -37,7 +37,7 @@
             await session.SaveChangesAsync(cancellationToken);
 
             return new CreateProductResult(product.Id);
-            
+
         }
     }
 }

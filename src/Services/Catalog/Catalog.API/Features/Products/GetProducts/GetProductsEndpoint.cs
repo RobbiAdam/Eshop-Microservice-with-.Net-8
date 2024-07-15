@@ -1,4 +1,4 @@
-﻿namespace Catalog.API.Products.GetProducts
+﻿namespace Catalog.API.Features.Products.GetProducts
 {
     public record GetProductsRequest(int? PageNumber = 1, int? PageSize = 10);
     public record GetProductResponse(
@@ -12,7 +12,7 @@
                 var query = request.Adapt<GetProductsQuery>();
 
                 var result = await sender.Send(query);
-                
+
                 var response = result.Adapt<GetProductResponse>();
 
                 return Results.Ok(response);

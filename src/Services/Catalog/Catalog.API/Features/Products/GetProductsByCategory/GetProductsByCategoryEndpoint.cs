@@ -1,5 +1,4 @@
-﻿
-namespace Catalog.API.Products.GetProductsByCategory
+﻿namespace Catalog.API.Features.Products.GetProductsByCategory
 {
     public record GetProductsByCategoryResponse(IEnumerable<Product> Products);
     public class GetProductsByCategoryEndpoint : ICarterModule
@@ -10,9 +9,9 @@ namespace Catalog.API.Products.GetProductsByCategory
                 string category, ISender sender) =>
             {
                 var result = await sender.Send(new GetProductsByCategoryQuery(category));
-                
+
                 var response = result.Adapt<GetProductsByCategoryResponse>();
-                
+
                 return Results.Ok(response);
             });
         }

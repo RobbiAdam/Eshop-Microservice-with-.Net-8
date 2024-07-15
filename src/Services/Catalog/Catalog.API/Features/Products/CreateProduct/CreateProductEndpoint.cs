@@ -1,4 +1,4 @@
-﻿namespace Catalog.API.Products.CreateProduct
+﻿namespace Catalog.API.Features.Products.CreateProduct
 {
     public record CreateProductRequest(
         string Name, string Description, List<string> Category, string ImageFile, decimal Price);
@@ -25,7 +25,7 @@
                 .ProducesProblem(StatusCodes.Status400BadRequest)
                 .WithSummary("Create Product")
                 .WithDescription("Create a new product");
-                
+
         }
     }
 }

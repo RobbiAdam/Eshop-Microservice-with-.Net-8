@@ -1,9 +1,9 @@
 ﻿using Catalog.API.Exceptions;
 
-namespace Catalog.API.Products.UpdateProduct
+namespace Catalog.API.Features.Products.UpdateProduct
 {
     public record UpdateProductCommand(
-        Guid Id, string Name, List<String> Category, 
+        Guid Id, string Name, List<string> Category,
         string Description, string ImageFile, decimal Price) : ICommand<UpdateProductResult>;
 
     public record UpdateProductResult(bool IsSuccess);
@@ -21,7 +21,7 @@ namespace Catalog.API.Products.UpdateProduct
     }
 
     internal class UpdateProductCommandHandler(
-        IDocumentSession session) 
+        IDocumentSession session)
         : ICommandHandler<UpdateProductCommand, UpdateProductResult>
     {
         public async Task<UpdateProductResult> Handle(
@@ -39,7 +39,7 @@ namespace Catalog.API.Products.UpdateProduct
             product.Description = command.Description;
             product.ImageFile = command.ImageFile;
             product.Price = command.Price;
-            
+
             session.Update(product);
             await session.SaveChangesAsync(cancellationToken);
 

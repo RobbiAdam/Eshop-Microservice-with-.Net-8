@@ -1,10 +1,7 @@
-﻿
-using Catalog.API.Products.GetProductById;
-
-namespace Catalog.API.Products.UpdateProduct
+﻿namespace Catalog.API.Features.Products.UpdateProduct
 {
     public record UpdateProductRequest(
-        Guid Id, string Name, List<String> Category,
+        Guid Id, string Name, List<string> Category,
         string Description, string ImageFile, decimal Price);
 
     public record UpdateProductResponse(bool IsSuccess);
@@ -19,7 +16,7 @@ namespace Catalog.API.Products.UpdateProduct
                 var result = await sender.Send(command);
 
                 var response = result.Adapt<UpdateProductResponse>();
-                
+
                 return Results.Ok(response);
             })
                 .WithName("UpdateProduct")
