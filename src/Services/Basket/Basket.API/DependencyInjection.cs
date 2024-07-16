@@ -11,7 +11,9 @@ namespace Basket.API
                 .AddMediator()
                 .AddMartenDatabase(config)
                 .AddRepository()
-                .AddExceptionHandling();
+                .AddRedis(config)
+                .AddExceptionHandling()
+                .AddHealthChecks(config);
         }
 
         private static IServiceCollection AddMediator(this IServiceCollection services)
@@ -34,14 +36,34 @@ namespace Basket.API
 
             return services;
         }
+
+        private static IServiceCollection AddRedis(this IServiceCollection services, ConfigurationManager config)
+        {
+            return services.AddStackExchangeRedisCache(cfg =>
+            {
+                cfg.Configuration = config.GetConnectionString("Redis")!;
+            });
+        }
+
         private static IServiceCollection AddRepository(this IServiceCollection services)
         {
             return services
-                .AddScoped<IBasketRepository, BasketRepository>();
+                .AddScoped<IBasketRepository, BasketRepository>()
+                .Decorate<IBasketRepository, CachedBasketRepository>();
         }
         private static IServiceCollection AddExceptionHandling(this IServiceCollection services)
         {
             return services.AddExceptionHandler<CustomExceptionHandler>();
+        }
+
+        private static IServiceCollection AddHealthChecks(this IServiceCollection services, ConfigurationManager config)
+        {
+            services.AddHealthChecks()
+                .AddNpgSql(config.GetConnectionString("Database")!)
+                .AddRedis(config.GetConnectionString("Redis")!);
+
+            return services;
+
         }
     }
 }
