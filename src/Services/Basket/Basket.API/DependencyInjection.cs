@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Exceptions.Handler;
+using Discount.Grpc;
 
 namespace Basket.API
 {
@@ -13,6 +14,7 @@ namespace Basket.API
                 .AddRepository()
                 .AddRedis(config)
                 .AddExceptionHandling()
+                .AddGrpc(config)
                 .AddHealthChecks(config);
         }
 
@@ -51,6 +53,26 @@ namespace Basket.API
                 .AddScoped<IBasketRepository, BasketRepository>()
                 .Decorate<IBasketRepository, CachedBasketRepository>();
         }
+
+        private static IServiceCollection AddGrpc(this IServiceCollection services, ConfigurationManager config)
+        {
+
+            services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(cfg =>
+            {
+                cfg.Address = new Uri(config.GetValue<string>("GrpcSettings:DiscountUrl")!);
+            })
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                {
+                    var handler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback 
+                        = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    };
+                    return handler;
+                });
+            return services;
+        }
+
         private static IServiceCollection AddExceptionHandling(this IServiceCollection services)
         {
             return services.AddExceptionHandler<CustomExceptionHandler>();
