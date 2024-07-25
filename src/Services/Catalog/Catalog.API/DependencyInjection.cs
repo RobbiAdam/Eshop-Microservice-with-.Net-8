@@ -3,7 +3,7 @@
     public static class DependencyInjection
     {
         public static IServiceCollection AddCatalogApi(
-            this IServiceCollection services, ConfigurationManager config)
+            this IServiceCollection services, IConfiguration config)
         {
             return services
                 .AddMediator()
@@ -29,7 +29,7 @@
             return services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         }
 
-        private static IServiceCollection AddMartenDatabase(this IServiceCollection services, ConfigurationManager config)
+        private static IServiceCollection AddMartenDatabase(this IServiceCollection services, IConfiguration config)
         {
             services.AddMarten(cfg =>
             {
@@ -39,7 +39,7 @@
             return services;
         }
 
-        private static IServiceCollection AddHealthChecks(this IServiceCollection services, ConfigurationManager config)
+        private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config)
         {
             services.AddHealthChecks()
                .AddNpgSql(config.GetConnectionString("Database")!);

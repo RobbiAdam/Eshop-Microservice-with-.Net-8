@@ -5,7 +5,7 @@ namespace Basket.API
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddBasketAPI(this IServiceCollection services, ConfigurationManager config)
+        public static IServiceCollection AddBasketAPI(this IServiceCollection services, IConfiguration config)
         {
             return services
                 .AddCarter()
@@ -28,7 +28,7 @@ namespace Basket.API
             });
         }
 
-        private static IServiceCollection AddMartenDatabase(this IServiceCollection services, ConfigurationManager config)
+        private static IServiceCollection AddMartenDatabase(this IServiceCollection services, IConfiguration config)
         {
             services.AddMarten(cfg =>
             {
@@ -39,7 +39,7 @@ namespace Basket.API
             return services;
         }
 
-        private static IServiceCollection AddRedis(this IServiceCollection services, ConfigurationManager config)
+        private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config)
         {
             return services.AddStackExchangeRedisCache(cfg =>
             {
@@ -54,7 +54,7 @@ namespace Basket.API
                 .Decorate<IBasketRepository, CachedBasketRepository>();
         }
 
-        private static IServiceCollection AddGrpc(this IServiceCollection services, ConfigurationManager config)
+        private static IServiceCollection AddGrpc(this IServiceCollection services, IConfiguration config)
         {
 
             services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(cfg =>
@@ -78,7 +78,7 @@ namespace Basket.API
             return services.AddExceptionHandler<CustomExceptionHandler>();
         }
 
-        private static IServiceCollection AddHealthChecks(this IServiceCollection services, ConfigurationManager config)
+        private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config)
         {
             services.AddHealthChecks()
                 .AddNpgSql(config.GetConnectionString("Database")!)
