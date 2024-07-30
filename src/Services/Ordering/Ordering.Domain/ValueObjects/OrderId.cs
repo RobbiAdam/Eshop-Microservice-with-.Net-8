@@ -6,7 +6,7 @@
 
         private OrderId(Guid value) => Value = value;
 
-        public OrderId Of(Guid value)
+        public static OrderId Of(Guid value)
         {
             ArgumentNullException.ThrowIfNull(value);
 
