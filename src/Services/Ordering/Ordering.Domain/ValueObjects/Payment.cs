@@ -17,7 +17,7 @@
             CardName = cardName;
             CardNumber = cardNumber;
             Expiration = expiration;
-            Cvv = cvv;
+            CVV = cvv;
             PaymentMethod = paymentMethod;
         }
 

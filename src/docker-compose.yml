@@ -3,10 +3,15 @@ version: '3.4'
 services:
   catalog.db: 
     image: postgres
+
   basket.db:
     image: postgres
+
   distributedcache:
     image: redis
+
+  order.db:
+    image: mcr.microsoft.com/mssql/server
 
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
