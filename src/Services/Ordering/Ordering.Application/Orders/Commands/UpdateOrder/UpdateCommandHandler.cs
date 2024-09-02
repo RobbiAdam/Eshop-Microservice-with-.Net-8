@@ -46,8 +46,8 @@ public class UpdateCommandHandler(IApplicationDbContext context)
         var updatedPayment = Payment.Of(
             orderDto.Payment.CardName,
             orderDto.Payment.CardNumber,
-            orderDto.Payment.Cvv,
             orderDto.Payment.Expiration,
+            orderDto.Payment.Cvv,
             orderDto.Payment.PaymentMethod);
 
         order.Update(

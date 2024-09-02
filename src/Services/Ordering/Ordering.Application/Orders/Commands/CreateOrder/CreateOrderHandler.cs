@@ -8,8 +8,8 @@ public class CreateOrderCommandHandler(IApplicationDbContext context)
 
         context.Orders.Add(order);
         await context.SaveChangesAsync(cancellationToken);
-        return new CreateOrderResult(order.Id.Value);
 
+        return new CreateOrderResult(order.Id.Value);
     }
 
     private Order CreateNewOrder(OrderDto orderDto)
@@ -19,8 +19,8 @@ public class CreateOrderCommandHandler(IApplicationDbContext context)
             orderDto.ShippingAddress.LastName,
             orderDto.ShippingAddress.EmailAddress,
             orderDto.ShippingAddress.AddressLine,
-            orderDto.ShippingAddress.State,
             orderDto.ShippingAddress.Country,
+            orderDto.ShippingAddress.State,
             orderDto.ShippingAddress.ZipCode);
 
         var billingAddress = Address.Of(
@@ -28,15 +28,15 @@ public class CreateOrderCommandHandler(IApplicationDbContext context)
             orderDto.BillingAddress.LastName,
             orderDto.BillingAddress.EmailAddress,
             orderDto.BillingAddress.AddressLine,
-            orderDto.BillingAddress.State,
             orderDto.BillingAddress.Country,
+            orderDto.BillingAddress.State,
             orderDto.BillingAddress.ZipCode);
 
         var payment = Payment.Of(
             orderDto.Payment.CardName,
             orderDto.Payment.CardNumber,
-            orderDto.Payment.Cvv,
             orderDto.Payment.Expiration,
+            orderDto.Payment.Cvv,
             orderDto.Payment.PaymentMethod);
 
         var newOrder = Order.Create(

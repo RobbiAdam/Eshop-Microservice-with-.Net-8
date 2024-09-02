@@ -6,7 +6,7 @@ internal class InitialData
     new List<Customer>
     {
         Customer.Create(CustomerId.Of(new Guid("58c49479-ec65-4de2-86e7-033c546291aa")), "Justin", "justinwong@gmail.com"),
-        Customer.Create(CustomerId.Of(new Guid("189dc8dc-990f-48e0-a37b-e6f2b60b9d7d")), "john", "john@gmail.com")
+        Customer.Create(CustomerId.Of(new Guid("189dc8dc-990f-48e0-a37b-e6f2b60b9d7d")), "john", "john@gmail.com"),
     };
 
     public static IEnumerable<Product> Products =>
@@ -25,8 +25,8 @@ internal class InitialData
             var address1 = Address.Of("Justin", "Wong", "justinwong@gmail.com", "Fallon Drive No:4", "North America", "Canada", "11111");
             var address2 = Address.Of("john", "doe", "john@gmail.com", "Broadway No:1", "England", "Nottingham", "08050");
 
-            var payment1 = Payment.Of("Justin", "5555555555554444", "12/28", "355", 1);
-            var payment2 = Payment.Of("john", "8885555555554444", "06/30", "222", 2);
+            var payment1 = Payment.Of("CARD-1", "5555555555554444", "12/28", "355", 1);
+            var payment2 = Payment.Of("CARD-2", "8885555555554444", "06/30", "222", 2);
 
             var order1 = Order.Create(
                             OrderId.Of(Guid.NewGuid()),

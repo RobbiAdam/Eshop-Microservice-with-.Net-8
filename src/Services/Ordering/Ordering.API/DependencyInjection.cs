@@ -1,17 +1,35 @@
-﻿namespace Ordering.API
+﻿using BuildingBlocks.Exceptions.Handler;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
+namespace Ordering.API;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration config)
     {
-        public static IServiceCollection AddApiServices(this IServiceCollection services)
-        {
+        services.AddCarter();
 
-            return services;
-        }
+        services.AddExceptionHandler<CustomExceptionHandler>();
 
-        public static WebApplication UseApiServices(this WebApplication app)
-        {
+        services.AddHealthChecks()
+            .AddSqlServer(config.GetConnectionString("Database")!);
+        
+        return services;
+    }
 
-            return app;
-        }
+    public static WebApplication UseApiServices(this WebApplication app)
+    {
+        app.MapCarter();
+
+        app.UseExceptionHandler(_ => { });
+
+        app.UseHealthChecks("/health",
+            new HealthCheckOptions
+            {
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+            });
+
+        return app;
     }
 }

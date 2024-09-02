@@ -1,55 +1,54 @@
-﻿namespace Catalog.API
+﻿namespace Catalog.API;
+
+public static class DependencyInjection
 {
-    public static class DependencyInjection
+    public static IServiceCollection AddCatalogApi(
+        this IServiceCollection services, IConfiguration config)
     {
-        public static IServiceCollection AddCatalogApi(
-            this IServiceCollection services, IConfiguration config)
+        return services
+            .AddMediator()
+            .AddValidation()
+            .AddCarter()
+            .AddMartenDatabase(config)
+            .AddHealthChecks(config)
+            .AddExceptionHandling();
+    }
+
+    private static IServiceCollection AddMediator(this IServiceCollection services)
+    {
+        return services.AddMediatR(cfg =>
         {
-            return services
-                .AddMediator()
-                .AddValidation()
-                .AddCarter()
-                .AddMartenDatabase(config)
-                .AddHealthChecks(config)
-                .AddExceptionHandling();
-        }
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+        });
+    }
 
-        private static IServiceCollection AddMediator(this IServiceCollection services)
+    private static IServiceCollection AddValidation(this IServiceCollection services)
+    {
+        return services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+    }
+
+    private static IServiceCollection AddMartenDatabase(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddMarten(cfg =>
         {
-            return services.AddMediatR(cfg =>
-            {
-                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-                cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
-                cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            });
-        }
+            cfg.Connection(config.GetConnectionString("Database")!);
+        }).UseLightweightSessions();
 
-        private static IServiceCollection AddValidation(this IServiceCollection services)
-        {
-            return services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-        }
+        return services;
+    }
 
-        private static IServiceCollection AddMartenDatabase(this IServiceCollection services, IConfiguration config)
-        {
-            services.AddMarten(cfg =>
-            {
-                cfg.Connection(config.GetConnectionString("Database")!);
-            }).UseLightweightSessions();
+    private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddHealthChecks()
+           .AddNpgSql(config.GetConnectionString("Database")!);
 
-            return services;
-        }
+        return services;
+    }
 
-        private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config)
-        {
-            services.AddHealthChecks()
-               .AddNpgSql(config.GetConnectionString("Database")!);
-
-            return services;
-        }
-
-        private static IServiceCollection AddExceptionHandling(this IServiceCollection services)
-        {
-            return services.AddExceptionHandler<CustomExceptionHandler>();
-        }
+    private static IServiceCollection AddExceptionHandling(this IServiceCollection services)
+    {
+        return services.AddExceptionHandler<CustomExceptionHandler>();
     }
 }
