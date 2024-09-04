@@ -1,11 +1,14 @@
 ﻿using BuildingBlocks.Exceptions.Handler;
+using BuildingBlocks.Messaging.MassTransit;
 using Discount.Grpc;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace Basket.API
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddBasketAPI(this IServiceCollection services, IConfiguration config)
+        public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration config)
         {
             return services
                 .AddCarter()
@@ -14,19 +17,32 @@ namespace Basket.API
                 .AddRepository()
                 .AddRedis(config)
                 .AddExceptionHandling()
-                .AddGrpc(config)
-                .AddHealthChecks(config);
+                .AddGrpcServices(config)
+                .AddHealthChecks(config)
+                .AddMessageBroker(config);
         }
 
-        private static IServiceCollection AddMediator(this IServiceCollection services)
+        public static WebApplication UseApiServices(this WebApplication app)
         {
-            return services.AddMediatR(cfg =>
+            app.MapCarter();
+            app.UseExceptionHandler(_ => { });
+
+            app.UseHealthChecks("/health",
+                new HealthCheckOptions
+                {
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+
+            return app;
+        }
+
+        private static IServiceCollection AddMediator(this IServiceCollection services) =>
+            services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
                 cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
             });
-        }
 
         private static IServiceCollection AddMartenDatabase(this IServiceCollection services, IConfiguration config)
         {
@@ -39,22 +55,18 @@ namespace Basket.API
             return services;
         }
 
-        private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config)
-        {
-            return services.AddStackExchangeRedisCache(cfg =>
+        private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config) =>
+            services.AddStackExchangeRedisCache(cfg =>
             {
                 cfg.Configuration = config.GetConnectionString("Redis")!;
             });
-        }
 
-        private static IServiceCollection AddRepository(this IServiceCollection services)
-        {
-            return services
+        private static IServiceCollection AddRepository(this IServiceCollection services) =>
+            services
                 .AddScoped<IBasketRepository, BasketRepository>()
                 .Decorate<IBasketRepository, CachedBasketRepository>();
-        }
-
-        private static IServiceCollection AddGrpc(this IServiceCollection services, IConfiguration config)
+        {
+        private static IServiceCollection AddGrpcServices(this IServiceCollection services, IConfiguration config)
         {
 
             services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(cfg =>
@@ -65,7 +77,7 @@ namespace Basket.API
                 {
                     var handler = new HttpClientHandler
                     {
-                        ServerCertificateCustomValidationCallback 
+                        ServerCertificateCustomValidationCallback
                         = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     };
                     return handler;
@@ -73,10 +85,8 @@ namespace Basket.API
             return services;
         }
 
-        private static IServiceCollection AddExceptionHandling(this IServiceCollection services)
-        {
-            return services.AddExceptionHandler<CustomExceptionHandler>();
-        }
+        private static IServiceCollection AddExceptionHandling(this IServiceCollection services) =>
+            services.AddExceptionHandler<CustomExceptionHandler>();
 
         private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration config)
         {
@@ -85,7 +95,6 @@ namespace Basket.API
                 .AddRedis(config.GetConnectionString("Redis")!);
 
             return services;
-
         }
     }
 }
