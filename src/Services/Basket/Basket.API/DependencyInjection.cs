@@ -65,7 +65,6 @@ namespace Basket.API
             services
                 .AddScoped<IBasketRepository, BasketRepository>()
                 .Decorate<IBasketRepository, CachedBasketRepository>();
-        {
         private static IServiceCollection AddGrpcServices(this IServiceCollection services, IConfiguration config)
         {
 
